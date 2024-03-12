@@ -10,7 +10,10 @@ import { MdSettings } from "react-icons/md";
  * @returns n, m, tileSize to fit the screen
  */
 function calculateGridSize(maxTiles: number, minSize: number) {
-  const { innerWidth, innerHeight } = window;
+  const { innerWidth, innerHeight } =
+    typeof window === "undefined"
+      ? { innerWidth: 100, innerHeight: 100 }
+      : window;
   const tileSize = Math.max(
     minSize,
     Math.min(innerWidth / maxTiles, innerHeight / maxTiles),
