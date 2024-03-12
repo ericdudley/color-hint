@@ -20,12 +20,7 @@ function calculateGridSize(maxTiles: number, minSize: number) {
   return { n, m, tileSize };
 }
 
-
-function generateColorGrid(
-  n: number,
-  m: number,
-  angleoff: number,
-): string[][] {
+function generateColorGrid(n: number, m: number, angleoff: number): string[][] {
   const grid: string[][] = [];
   const centerX = (n - 1) / 2;
   const centerY = (m - 1) / 2;
@@ -42,7 +37,7 @@ function generateColorGrid(
       const hue = Math.floor(angle % 360);
 
       // USE THIS FOR THE GAME
-      // let saturation = 80; 
+      // let saturation = 80;
       // let lightness = 60;
       let saturation = 20;
       let lightness = 10;
@@ -66,7 +61,7 @@ function ColorGrid() {
   return (
     <div className="fixed inset-0 flex flex-col items-center justify-center bg-base-100">
       {generateColorGrid(n, m, hue).map((row, i) => (
-        <div className="flex flex-row">
+        <div className="flex flex-row" key={`${Math.random()}`}>
           {row.map((color, j) => (
             <div
               key={j}
@@ -100,7 +95,7 @@ export default function Home() {
         <h1 className="text-8xl font-bold text-center">Color Hint</h1>
         <p>
           A color guessing game where everyone gets a turn to give hints while
-          the others guess the color they're describing.
+          the others guess the color they&apos;re describing.
         </p>
         <div>
           <div className="flex flex-row items-center gap-4">
@@ -144,9 +139,7 @@ export default function Home() {
                 className="input"
               />
             </div>
-            <button className="btn btn-lg mt-4">
-              Create Lobby
-            </button>
+            <button className="btn btn-lg mt-4">Create Lobby</button>
           </div>
         </div>
       </div>
