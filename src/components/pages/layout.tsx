@@ -3,5 +3,5 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
   }
 
-  return <div>{children}</div>;
+  return <div data-theme="dark">{children}</div>;
 }

@@ -15,6 +15,7 @@
     "@types/uuid": "^9.0.8",
     "@vercel/analytics": "^1.2.2",
     "ably": "^1.2.49",
+    "change-case": "^5.4.3",
     "clsx": "^2.1.0",
     "debug": "^4.3.4",
     "mobx-react-lite": "^4.0.6",

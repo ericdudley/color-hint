@@ -1,7 +1,11 @@
 import { makeAutoObservable } from "mobx";
+import { ComponentType } from "react";
+import {
+  Gi3DGlasses,
+  GiPaintBrush,
+  GiPaintBucket
+} from "react-icons/gi";
 import { generateUUID } from "./uuid";
-import { Gi3DGlasses } from "react-icons/gi";
-import { ComponentType, ReactElement } from "react";
 
 export type Player = {
   id: string;
@@ -14,7 +18,7 @@ export type Player = {
 export default class PlayerSettings {
   id: string = generateUUID();
   name: string = "";
-  icon?: IconName;
+  icon: IconName = "paintbrush";
   color: string = "#000000";
   isHost: boolean = false;
 
@@ -82,13 +86,15 @@ export default class PlayerSettings {
 
 export const playerSettings = new PlayerSettings();
 
-const IconNames = ["glasses"] as const;
+export const IconNames = ["paintbrush", "glasses", "paintBucket"] as const;
 
-type IconName = (typeof IconNames)[number];
+export type IconName = (typeof IconNames)[number];
 
 export const ICON_NAME_TO_ICON: Record<
   IconName,
   ComponentType<{ className: string }>
 > = {
+  paintbrush: GiPaintBrush,
   glasses: Gi3DGlasses,
+  paintBucket: GiPaintBucket,
 };

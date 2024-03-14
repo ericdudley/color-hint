@@ -43,41 +43,44 @@ export default observer(function HomePage() {
         </p>
       </div>
 
-      <PlayerSettingsForm />
+      <div className="flex gap-4 flex-wrap">
+        <div className="flex-1">
+          <PlayerSettingsForm />
+        </div>
+        <div className="flex-1 flex flex-col gap-8">
+          <div className="flex gap-4 items-end">
+            <Input
+              className="flex-1"
+              label="Lobby Code"
+              type="text"
+              placeholder="Lobby Code"
+              value={joinLobbyCode}
+              onChange={(e) => setJoinLobbyCode(e.target.value)}
+            />
+            <button
+              className="btn btn-primary"
+              onClick={joinGame}
+              disabled={!playerSettings.isReady}
+            >
+              <span>Join Existing Game</span>
+              <MdArrowRight className="w-8 h-8" />
+            </button>
+          </div>
 
-      <div className="divider" />
-
-      <div className="flex gap-4 items-end">
-        <Input
-          className="flex-1"
-          label="Lobby Code"
-          type="text"
-          placeholder="Lobby Code"
-          value={joinLobbyCode}
-          onChange={(e) => setJoinLobbyCode(e.target.value)}
-        />
-        <button
-          className="btn btn-primary"
-          onClick={joinGame}
-          disabled={!playerSettings.isReady}
-        >
-          <span>Join Existing Game</span>
-          <MdArrowRight className="w-8 h-8" />
-        </button>
+          <button
+            className="btn btn-primary mt-4"
+            onClick={createGame}
+            disabled={!playerSettings.isReady}
+          >
+            <span>Create New Game</span>
+            <MdAddCircle className="w-8 h-8" />
+          </button>
+          <GameSettingsForm
+            gameSettings={gameSettings}
+            onChange={(gameSettings) => setGameSettings(gameSettings)}
+          />
+        </div>
       </div>
-
-      <button
-        className="btn btn-primary mt-4"
-        onClick={createGame}
-        disabled={!playerSettings.isReady}
-      >
-        <span>Create New Game</span>
-        <MdAddCircle className="w-8 h-8" />
-      </button>
-      <GameSettingsForm
-        gameSettings={gameSettings}
-        onChange={(gameSettings) => setGameSettings(gameSettings)}
-      />
     </CenteredLayout>
   );
 });

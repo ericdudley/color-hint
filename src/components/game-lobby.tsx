@@ -7,6 +7,7 @@ import CenteredLayout from "./centered-layout";
 import { useGameContext } from "./game-view";
 import { useRouter } from "next/navigation";
 import { observer } from "mobx-react-lite";
+import PlayerCard from "./player-card";
 
 const LobbyCodeCopyButton = observer(function LobbyCodeCopyButton() {
   const { lobbyCode } = useGameContext();
@@ -70,30 +71,12 @@ export default observer(function GameLobby(): ReactElement {
         )}
       </div>
       <div className="flex items-end">
-        <p>Waiting for players to join</p>
+        <p>Waiting for other players to join</p>
         <div className="loading loading-dots loading-xs" />
       </div>
-      {gameClient.players.map((player) => {
-        const IconComponent = player.icon
-          ? ICON_NAME_TO_ICON[player.icon] ?? GiPaintBrush
-          : GiPaintBrush;
-        return (
-          <div
-            key={player.id}
-            className="flex items-center gap-4 bg-base-100 p-4 rounded-lg"
-          >
-            <div className="avatar bg-red-400 p-4 rounded-full">
-              <IconComponent className="w-8 h-8" />
-            </div>
-            <div>
-              <h3 className="font-bold text-2xl">{player.name}</h3>
-              {player.isHost && (
-                <span className="badge badge-primary">Host</span>
-              )}
-            </div>
-          </div>
-        );
-      })}
+      {gameClient.players.map((player) => (
+        <PlayerCard key={player.id} player={player} />
+      ))}
     </CenteredLayout>
   );
 });
