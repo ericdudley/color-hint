@@ -23,9 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="dark">
       <body className={inter.className}>
-        <DynamicLayout>
-          {children}
-        </DynamicLayout>
+        <DynamicLayout>{children}</DynamicLayout>
       </body>
     </html>
   );

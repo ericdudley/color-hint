@@ -2,10 +2,12 @@ import { generateUUID } from "@/utils/uuid";
 import * as Ably from "ably";
 import { NextResponse } from "next/server";
 
+export const revalidate = 0;
+
 /**
  * Helper endpoint to allow the web client to anonymously create a new Ably channel.
  */
-export async function POST(request: Request) {
+export async function GET(request: Request) {
   return new Promise<Response>((resolve, reject) => {
     if (!process.env.ABLY_API_KEY) {
       reject(new Error("Missing environment variable: ABLY_API_KEY"));

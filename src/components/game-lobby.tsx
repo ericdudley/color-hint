@@ -69,12 +69,14 @@ export default observer(function GameLobby(): ReactElement {
           <button className="btn btn-primary">Start Game</button>
         )}
       </div>
-      <div className="flex items-center gap-4">
-        <div className="loading" />
-        <p>Waiting for players to join...</p>
+      <div className="flex items-end">
+        <p>Waiting for players to join</p>
+        <div className="loading loading-dots loading-xs" />
       </div>
       {gameClient.players.map((player) => {
-        const IconComponent = player.icon ? ICON_NAME_TO_ICON[player.icon] ?? GiPaintBrush : GiPaintBrush;
+        const IconComponent = player.icon
+          ? ICON_NAME_TO_ICON[player.icon] ?? GiPaintBrush
+          : GiPaintBrush;
         return (
           <div
             key={player.id}

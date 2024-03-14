@@ -3,6 +3,9 @@ import { Player, playerSettings } from "./player-settings";
 import { generateLobbyCode } from "./uuid";
 import * as Ably from "ably";
 import { makeAutoObservable } from "mobx";
+import debug from "debug";
+const d = debug("game-server");
+d.enabled = true;
 
 export class ChannelClient {
   channel: Ably.Types.RealtimeChannelCallbacks | null = null;
@@ -36,16 +39,24 @@ export class ChannelClient {
     this.channel?.detach();
     this.channel = null;
   };
+
+  onAttach = (callback: () => void) => {
+    this.channel?.once("attached", callback);
+  }
 }
 
 export default class GameServer {
   players: Player[] = [];
   channelClient: ChannelClient;
+  isAttached = false;
 
   constructor(public lobbyCode: string) {
     makeAutoObservable(this);
     this.channelClient = new ChannelClient(`game:${this.lobbyCode}`);
     this.channelClient.subscribe(this.handleMessage);
+    this.channelClient.onAttach(() => {
+      this.isAttached = true;
+    });
   }
 
   close = () => {
@@ -70,6 +81,7 @@ export default class GameServer {
 }
 
 export function createGameServer(lobbyCode: string): GameServer {
+  d(`Creating game server for lobby ${lobbyCode}`);
   const game = new GameServer(lobbyCode);
   return game;
 }
@@ -105,7 +117,13 @@ export class GameClient {
 }
 
 export function createGameClient(lobbyCode: string): GameClient {
+  d(`Creating game client for lobby ${lobbyCode}`);
   const game = new GameClient(lobbyCode);
+
+  game.channelClient.onAttach(() => {
+    game.joinGame();
+  });
+  
   return game;
 }
 

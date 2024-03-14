@@ -5,30 +5,30 @@ import { useState, useEffect } from "react";
 
 export default function Background() {
   const { n, m, tileSize } = calculateGridSize(24);
-  const [hue, setHue] = useState(0);
-  useEffect(() => {
-    let start: number;
-    let animationFrameHandle: number;
+  const [hue, _setHue] = useState(0);
+  // useEffect(() => {
+  //   let start: number;
+  //   let animationFrameHandle: number;
 
-    const step = (timestamp: number) => {
-      if (start === undefined) {
-        start = timestamp;
-      }
-      const elapsed = timestamp - start;
+  //   const step = (timestamp: number) => {
+  //     if (start === undefined) {
+  //       start = timestamp;
+  //     }
+  //     const elapsed = timestamp - start;
 
-      if (elapsed > 64) {
-        // 64ms have passed
-        start = timestamp;
-        setHue((hue) => (hue + 5) % 360);
-      }
+  //     if (elapsed > 64) {
+  //       // 64ms have passed
+  //       start = timestamp;
+  //       setHue((hue) => (hue + 5) % 360);
+  //     }
 
-      animationFrameHandle = requestAnimationFrame(step);
-    };
+  //     animationFrameHandle = requestAnimationFrame(step);
+  //   };
 
-    animationFrameHandle = requestAnimationFrame(step);
+  //   animationFrameHandle = requestAnimationFrame(step);
 
-    return () => cancelAnimationFrame(animationFrameHandle);
-  }, []);
+  //   return () => cancelAnimationFrame(animationFrameHandle);
+  // }, []);
 
   return (
     <div className="fixed inset-0 flex flex-col items-center justify-center bg-base-100">
