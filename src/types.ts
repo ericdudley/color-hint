@@ -12,8 +12,8 @@ export type Player = {
 
 export type GameSettings = {
   rounds: number;
-  hintsPerPlayerRound: number[];
-  guessesPerPlayerRound: number[];
+  hintsPerPlayerRound: number;
+  guessesPerPlayerRound: number;
 };
 
 export type Guess = {
