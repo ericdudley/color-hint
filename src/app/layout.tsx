@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import { Inter } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react"
 
 import "./globals.css";
 
@@ -24,6 +25,7 @@ export default function RootLayout({
     <html lang="en" data-theme="dark">
       <body className={inter.className}>
         <DynamicLayout>{children}</DynamicLayout>
+        <Analytics />
       </body>
     </html>
   );

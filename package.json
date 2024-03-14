@@ -13,6 +13,7 @@
   "dependencies": {
     "@types/ably": "^1.0.0",
     "@types/uuid": "^9.0.8",
+    "@vercel/analytics": "^1.2.2",
     "ably": "^1.2.49",
     "clsx": "^2.1.0",
     "debug": "^4.3.4",
