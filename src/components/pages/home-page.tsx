@@ -57,7 +57,7 @@ export default observer(function HomePage() {
           onChange={(e) => setJoinLobbyCode(e.target.value)}
         />
         <button
-          className="btn"
+          className="btn btn-primary"
           onClick={joinGame}
           disabled={!playerSettings.isReady}
         >
@@ -67,7 +67,7 @@ export default observer(function HomePage() {
       </div>
 
       <button
-        className="btn mt-4"
+        className="btn btn-primary mt-4"
         onClick={createGame}
         disabled={!playerSettings.isReady}
       >

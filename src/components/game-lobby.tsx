@@ -21,14 +21,14 @@ const LobbyCodeCopyButton = observer(function LobbyCodeCopyButton() {
         readOnly
       />
       <button
-        className="btn btn-primary"
+        className="btn btn-ghost"
         onClick={() => navigator.clipboard.writeText(lobbyCode)}
       >
         Copy Lobby Code
         <MdCopyAll className="w-6 h-6" />
       </button>
       <button
-        className="btn btn-secondary"
+        className="btn btn-ghost"
         onClick={() => navigator.clipboard.writeText(window.location.href)}
       >
         Copy Lobby Link
@@ -44,7 +44,7 @@ export default observer(function GameLobby(): ReactElement {
   return (
     <CenteredLayout>
       <button
-        className="btn btn-secondary"
+        className="btn btn-neutral"
         onClick={() => {
           gameClient.leaveGame();
           replace("/");

@@ -31,3 +31,48 @@ body {
     text-wrap: balance;
   }
 }
+
+/* Define a keyframes animation that rotates 360 degrees */
+@keyframes rotateBackground {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes filterFade {
+  from {
+    filter: saturate(0) brightness(0) blur(128px);
+  }
+
+  to {
+    filter: saturate(0.6) brightness(0.25) blur(64px);
+  }
+
+}
+
+/* Apply this animation to a pseudo-element or a child element */
+.animated-color-wheel::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: conic-gradient(
+    from 180deg at 50% 50%,
+    #f00,
+    #ff0,
+    #0f0,
+    #0ff,
+    #00f,
+    #f0f,
+    #f00
+  );
+  filter: saturate(0) brightness(0) blur(128px);
+  animation: rotateBackground 10s linear infinite, filterFade 4s forwards;
+
+  z-index: -1;
+}

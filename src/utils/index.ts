@@ -42,7 +42,7 @@ export function generateColorGrid(
       // let saturation = 80;
       // let lightness = 60;
       let saturation = 20;
-      let lightness = 20;
+      let lightness = 40;
 
       row.push(`hsl(${hue}, ${saturation}%, ${lightness}%)`);
     }

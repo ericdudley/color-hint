@@ -1,7 +1,7 @@
 "use client";
 
-import { calculateGridSize, generateColorGrid } from "@/utils";
-import { useState, useEffect } from "react";
+import { calculateGridSize } from "@/utils";
+import { useState } from "react";
 
 export default function Background() {
   const { n, m, tileSize } = calculateGridSize(24);
@@ -31,8 +31,9 @@ export default function Background() {
   // }, []);
 
   return (
-    <div className="fixed inset-0 flex flex-col items-center justify-center bg-base-100">
-      {generateColorGrid(n, m, hue).map((row, i) => (
+    <div className="fixed inset-[-100%] flex flex-col items-center justify-center bg-gradient-conic animated-color-wheel" />
+    // TODO Use this for the actual game
+    /** {generateColorGrid(n, m, hue).map((row, i) => (
         <div className="flex flex-row" key={`${Math.random()}`}>
           {row.map((color, j) => (
             <div
@@ -50,7 +51,6 @@ export default function Background() {
             </div>
           ))}
         </div>
-      ))}
-    </div>
+      ))} */
   );
 }
