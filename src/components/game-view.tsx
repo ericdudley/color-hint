@@ -40,7 +40,7 @@ export default observer(function GameView({
   lobbyCode: string;
 }) {
   const gameServer = useGameServer(lobbyCode);
-  const gameClient = useGameClient(lobbyCode, gameServer?.isAttached || false);
+  const gameClient = useGameClient(lobbyCode, gameServer?.isAttached || !playerSettings.isHost);
 
   if ((!gameServer && playerSettings.isHost) || !gameClient) {
     return (
