@@ -42,7 +42,7 @@ export class ChannelClient {
 
   onAttach = (callback: () => void) => {
     this.channel?.once("attached", callback);
-  }
+  };
 }
 
 export default class GameServer {
@@ -123,7 +123,7 @@ export function createGameClient(lobbyCode: string): GameClient {
   game.channelClient.onAttach(() => {
     game.joinGame();
   });
-  
+
   return game;
 }
 

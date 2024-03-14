@@ -42,15 +42,17 @@ export default observer(function GameView({
   const gameServer = useGameServer(lobbyCode);
   const gameClient = useGameClient(lobbyCode, gameServer?.isAttached || false);
 
-  if (!gameServer || !gameClient) {
-    return <CenteredLayout>
-      <div className="flex flex-col items-center gap-2">
-      <h1 className="text-2xl">{
-        playerSettings.isHost ? "Creating game" : "Joining game"
-      }</h1>
-      <div className="loading loading-dots loading-lg"/>
-    </div>
-    </CenteredLayout>
+  if ((!gameServer && playerSettings.isHost) || !gameClient) {
+    return (
+      <CenteredLayout>
+        <div className="flex flex-col items-center gap-2">
+          <h1 className="text-2xl">
+            {playerSettings.isHost ? "Creating game" : "Joining game"}
+          </h1>
+          <div className="loading loading-dots loading-lg" />
+        </div>
+      </CenteredLayout>
+    );
   }
 
   return (
