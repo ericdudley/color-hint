@@ -72,6 +72,15 @@ export default class GameServer {
           this.channelClient.publish("updatedPlayers", this.players);
         }
         break;
+      case "playerUpdate":
+        this.players = this.players.map((p) => {
+          if (p.id === message.data.id) {
+            return message.data;
+          }
+          return p;
+        });
+        this.channelClient.publish("updatedPlayers", this.players);
+        break;
       case "playerLeave":
         this.players = this.players.filter((p) => p.id !== message.data.id);
         this.channelClient.publish("updatedPlayers", this.players);
@@ -110,6 +119,10 @@ export class GameClient {
     this.channelClient.publish("playerJoin", playerSettings.player);
   };
 
+  updatePlayer = () => {
+    this.channelClient.publish("playerUpdate", playerSettings.player);
+  };
+
   leaveGame = () => {
     this.channelClient.publish("playerLeave", playerSettings.player);
     this.channelClient.close();
@@ -127,10 +140,15 @@ export function createGameClient(lobbyCode: string): GameClient {
   return game;
 }
 
-type MessageName = "playerJoin" | "playerLeave" | "updatedPlayers";
+type MessageName =
+  | "playerJoin"
+  | "playerLeave"
+  | "updatedPlayers"
+  | "playerUpdate";
 type MessageNameToPayload = {
   playerJoin: Player;
   playerLeave: Player;
+  playerUpdate: Player;
   updatedPlayers: Player[];
 };
 

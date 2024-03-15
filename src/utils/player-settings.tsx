@@ -1,11 +1,7 @@
 import { makeAutoObservable } from "mobx";
 import { ComponentType } from "react";
-import {
-  Gi3DGlasses,
-  GiPaintBrush,
-  GiPaintBucket
-} from "react-icons/gi";
-import { generateUUID } from "./uuid";
+import { Gi3DGlasses, GiPaintBrush, GiPaintBucket } from "react-icons/gi";
+import { generateName, generateUUID } from "./uuid";
 
 export type Player = {
   id: string;
@@ -17,7 +13,7 @@ export type Player = {
 
 export default class PlayerSettings {
   id: string = generateUUID();
-  name: string = "";
+  name: string = generateName();
   icon: IconName = "paintbrush";
   color: string = "#000000";
   isHost: boolean = false;
@@ -28,7 +24,7 @@ export default class PlayerSettings {
   }
 
   private saveToStorage() {
-    localStorage.setItem(
+    sessionStorage.setItem(
       "playerSettings",
       JSON.stringify({
         id: this.id,
@@ -41,7 +37,7 @@ export default class PlayerSettings {
   }
 
   private loadFromStorage() {
-    const data = localStorage.getItem("playerSettings");
+    const data = sessionStorage.getItem("playerSettings");
     if (data) {
       const settings = JSON.parse(data);
       this.id = settings.id;

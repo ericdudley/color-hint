@@ -1,8 +1,4 @@
-import {
-  IconName,
-  IconNames,
-  playerSettings,
-} from "@/utils/player-settings";
+import { IconName, IconNames, playerSettings } from "@/utils/player-settings";
 import { capitalCase } from "change-case";
 import { observer } from "mobx-react-lite";
 import { ReactElement } from "react";
@@ -10,7 +6,11 @@ import { MdPerson } from "react-icons/md";
 import Input from "./input";
 import PlayerCard from "./player-card";
 
-export default observer(function PlayerSettingsForm(): ReactElement {
+export default observer(function PlayerSettingsForm({
+  onSave,
+}: {
+  onSave?: () => void;
+}): ReactElement {
   return (
     <div className="collapse collapse-arrow">
       <input type="checkbox" name="player-settings" defaultChecked />
@@ -55,6 +55,11 @@ export default observer(function PlayerSettingsForm(): ReactElement {
             className="input w-full"
           />
         </div>
+        {onSave && (
+          <button className="btn btn-primary" onClick={onSave}>
+            Update Player Settings
+          </button>
+        )}
       </div>
     </div>
   );

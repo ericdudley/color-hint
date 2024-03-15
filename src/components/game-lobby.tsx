@@ -8,6 +8,7 @@ import { useGameContext } from "./game-view";
 import { useRouter } from "next/navigation";
 import { observer } from "mobx-react-lite";
 import PlayerCard from "./player-card";
+import PlayerSettingsForm from "./player-settings-form";
 
 const LobbyCodeCopyButton = observer(function LobbyCodeCopyButton() {
   const { lobbyCode } = useGameContext();
@@ -58,6 +59,12 @@ export default observer(function GameLobby(): ReactElement {
       </div>
 
       <LobbyCodeCopyButton />
+
+      <PlayerSettingsForm
+        onSave={() => {
+          gameClient.updatePlayer();
+        }}
+      />
 
       <div className="flex items-center gap-4 justify-between">
         <h2 className="text-2xl font-bold flex items-center gap-2">
