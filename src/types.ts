@@ -1,5 +1,7 @@
 // All types for the Color Hint game
 
+import { IconName } from "./utils/player-settings";
+
 export type Color = {
   name: string;
   hex: string;
@@ -8,6 +10,9 @@ export type Color = {
 export type Player = {
   id: string;
   name: string;
+  icon?: IconName;
+  color: string;
+  isHost: boolean;
 };
 
 export type GameSettings = {
@@ -22,6 +27,7 @@ export type Guess = {
 };
 
 export type GameStatus = "lobby" | "playing";
+
 export type GameRound = {
   round: number;
   playerRounds: PlayerRound[];
@@ -34,10 +40,10 @@ export type PlayerRound = {
   guesses: Guess[];
 };
 
-export type Game = {
-  lobbyCode: string;
+export type GameState = {
   players: Player[];
   settings: GameSettings;
+  scores: Record<string, number>;
   status: GameStatus;
-  rounds: GameRound[];
+  currentRound: GameRound;
 };

@@ -1,15 +1,21 @@
 import { makeAutoObservable } from "mobx";
 import { ComponentType } from "react";
-import { Gi3DGlasses, GiPaintBrush, GiPaintBucket } from "react-icons/gi";
+import {
+  Gi3DGlasses,
+  GiCakeSlice,
+  GiPaintBrush,
+  GiPaintBucket,
+  GiPencilRuler,
+  GiPianoKeys,
+  GiRainbowStar,
+  GiStopSign,
+  GiSunCloud,
+  GiTreehouse,
+  GiTrojanHorse,
+  GiWrappedSweet,
+} from "react-icons/gi";
 import { generateName, generateUUID } from "./uuid";
-
-export type Player = {
-  id: string;
-  name: string;
-  icon?: IconName;
-  color: string;
-  isHost: boolean;
-};
+import { Player } from "@/types";
 
 export default class PlayerSettings {
   id: string = generateUUID();
@@ -82,7 +88,20 @@ export default class PlayerSettings {
 
 export const playerSettings = new PlayerSettings();
 
-export const IconNames = ["paintbrush", "glasses", "paintBucket"] as const;
+export const IconNames = [
+  "paintbrush",
+  "glasses",
+  "paintBucket",
+  "cake",
+  "pencilRuler",
+  "piano",
+  "rainbowStar",
+  "cloud",
+  "stopSign",
+  "treehouse",
+  "horse",
+  "candy"
+] as const;
 
 export type IconName = (typeof IconNames)[number];
 
@@ -93,4 +112,13 @@ export const ICON_NAME_TO_ICON: Record<
   paintbrush: GiPaintBrush,
   glasses: Gi3DGlasses,
   paintBucket: GiPaintBucket,
+  cake: GiCakeSlice,
+  pencilRuler: GiPencilRuler,
+  piano: GiPianoKeys,
+  rainbowStar: GiRainbowStar,
+  cloud: GiSunCloud,
+  stopSign: GiStopSign,
+  treehouse: GiTreehouse,
+  horse: GiTrojanHorse,
+  candy: GiWrappedSweet
 };

@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { observer } from "mobx-react-lite";
 import PlayerCard from "./player-card";
 import PlayerSettingsForm from "./player-settings-form";
+import { MAX_PLAYERS } from "@/constants";
 
 const LobbyCodeCopyButton = observer(function LobbyCodeCopyButton() {
   const { lobbyCode } = useGameContext();
@@ -41,7 +42,7 @@ const LobbyCodeCopyButton = observer(function LobbyCodeCopyButton() {
 });
 
 export default observer(function GameLobby(): ReactElement {
-  const { gameClient } = useGameContext();
+  const { gameClient, gameServer } = useGameContext();
   const { replace } = useRouter();
   return (
     <CenteredLayout>
@@ -70,18 +71,23 @@ export default observer(function GameLobby(): ReactElement {
         <h2 className="text-2xl font-bold flex items-center gap-2">
           Players
           <span className="badge badge-primary">
-            {gameClient.players.length}
+            {gameClient.gameState.players.length} / {MAX_PLAYERS}
           </span>
         </h2>
-        {gameClient.players.length >= 1 && playerSettings.isHost && (
-          <button className="btn btn-primary">Start Game</button>
+        {gameClient.gameState.players.length >= 1 && playerSettings.isHost && (
+          <button
+            className="btn btn-primary"
+            onClick={() => gameClient.startGame()}
+          >
+            Start Game
+          </button>
         )}
       </div>
       <div className="flex items-end">
         <p>Waiting for other players to join</p>
         <div className="loading loading-dots loading-xs" />
       </div>
-      {gameClient.players.map((player) => (
+      {gameClient.gameState.players.map((player) => (
         <PlayerCard key={player.id} player={player} />
       ))}
     </CenteredLayout>

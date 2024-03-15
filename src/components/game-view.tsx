@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useRef } from "react";
 import GameLobby from "./game-lobby";
 import CenteredLayout from "./centered-layout";
+import GameBoard from "./game-board";
 
 const useGameServer = (lobbyCode: string) => {
   const gameServerRef = useRef<GameServer | null>(null);
@@ -67,7 +68,11 @@ export default observer(function GameView({
           lobbyCode: lobbyCode,
         }}
       >
-        <GameLobby />
+        {gameClient.gameState.status === "lobby" ? (
+          <GameLobby />
+        ) : (
+          <GameBoard />
+        )}
       </GameContext.Provider>
     </div>
   );

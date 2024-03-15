@@ -1,9 +1,11 @@
 import { getAblyClient } from "./ably";
-import { Player, playerSettings } from "./player-settings";
+import { playerSettings } from "./player-settings";
 import { generateLobbyCode } from "./uuid";
 import * as Ably from "ably";
 import { makeAutoObservable } from "mobx";
 import debug from "debug";
+import { GameState, Player } from "@/types";
+import { MAX_PLAYERS } from "@/constants";
 const d = debug("game-server");
 d.enabled = true;
 
@@ -46,7 +48,21 @@ export class ChannelClient {
 }
 
 export default class GameServer {
-  players: Player[] = [];
+  gameState: GameState = {
+    players: [],
+    settings: {
+      rounds: 3,
+      hintsPerPlayerRound: 2,
+      guessesPerPlayerRound: 2,
+    },
+    scores: {},
+    status: "lobby",
+    currentRound: {
+      round: 1,
+      playerRounds: [],
+    },
+  };
+
   channelClient: ChannelClient;
   isAttached = false;
 
@@ -67,23 +83,38 @@ export default class GameServer {
     console.log("server", message);
     switch (message.name) {
       case "playerJoin":
-        if (!this.players.find((p) => p.id === message.data.id)) {
-          this.players.push(message.data);
-          this.channelClient.publish("updatedPlayers", this.players);
+        // Don't allow players to join once the game has started
+        if (this.gameState.status === "playing"|| this.gameState.players.length >= MAX_PLAYERS) {
+          return;
         }
+
+        if (!this.gameState.players.find((p) => p.id === message.data.id)) {
+          this.gameState.players.push(message.data);
+        }
+        this.channelClient.publish("gameStateUpdate", this.gameState);
         break;
       case "playerUpdate":
-        this.players = this.players.map((p) => {
+        this.gameState.players = this.gameState.players.map((p) => {
           if (p.id === message.data.id) {
             return message.data;
           }
           return p;
         });
-        this.channelClient.publish("updatedPlayers", this.players);
+        this.channelClient.publish("gameStateUpdate", this.gameState);
         break;
       case "playerLeave":
-        this.players = this.players.filter((p) => p.id !== message.data.id);
-        this.channelClient.publish("updatedPlayers", this.players);
+        this.gameState.players = this.gameState.players.filter(
+          (p) => p.id !== message.data.id,
+        );
+        this.channelClient.publish("gameStateUpdate", this.gameState);
+        break;
+      case "startGame":
+        this.gameState.status = "playing";
+        this.channelClient.publish("gameStateUpdate", this.gameState);
+        break;
+      case "endGame":
+        this.gameState.status = "lobby";
+        this.channelClient.publish("gameStateUpdate", this.gameState);
         break;
     }
   };
@@ -96,7 +127,20 @@ export function createGameServer(lobbyCode: string): GameServer {
 }
 
 export class GameClient {
-  players: Player[] = [];
+  gameState: GameState = {
+    players: [],
+    settings: {
+      rounds: 3,
+      hintsPerPlayerRound: 2,
+      guessesPerPlayerRound: 2,
+    },
+    scores: {},
+    status: "lobby",
+    currentRound: {
+      round: 1,
+      playerRounds: [],
+    },
+  };
 
   channelClient: ChannelClient;
 
@@ -109,8 +153,9 @@ export class GameClient {
   handleMessage = (message: AnyMessage) => {
     console.log("client", message);
     switch (message.name) {
-      case "updatedPlayers":
-        this.players = message.data;
+      case "gameStateUpdate":
+        this.gameState = message.data; // Assuming the client has a gameState object
+        // Update local player state based on gameState, if necessary
         break;
     }
   };
@@ -121,6 +166,14 @@ export class GameClient {
 
   updatePlayer = () => {
     this.channelClient.publish("playerUpdate", playerSettings.player);
+  };
+
+  startGame = () => {
+    this.channelClient.publish("startGame", undefined);
+  };
+
+  endGame = () => {
+    this.channelClient.publish("endGame", undefined);
   };
 
   leaveGame = () => {
@@ -143,13 +196,17 @@ export function createGameClient(lobbyCode: string): GameClient {
 type MessageName =
   | "playerJoin"
   | "playerLeave"
-  | "updatedPlayers"
-  | "playerUpdate";
+  | "gameStateUpdate"
+  | "playerUpdate"
+  | "startGame"
+  | "endGame";
 type MessageNameToPayload = {
   playerJoin: Player;
   playerLeave: Player;
   playerUpdate: Player;
-  updatedPlayers: Player[];
+  gameStateUpdate: GameState;
+  startGame: undefined;
+  endGame: undefined;
 };
 
 type Message<T extends MessageName> = {
