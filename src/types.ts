@@ -23,7 +23,7 @@ export type GameSettings = {
 
 export type Guess = {
   playerId: string;
-  guess: string;
+  guess: GridColor;
 };
 
 export type GameStatus = "lobby" | "playing";
@@ -33,10 +33,19 @@ export type GameRound = {
   playerRounds: PlayerRound[];
 };
 
+export type GridColor = {
+  x: number;
+  y: number;
+};
+
 export type PlayerRound = {
   hintingPlayerId: string;
-  color: string;
-  hints: string[];
+  color?: GridColor;
+  hintRounds: HintRound[];
+};
+
+export type HintRound = {
+  hint?: string;
   guesses: Guess[];
 };
 

@@ -4,18 +4,28 @@
  * @param minSize
  * @returns n, m, tileSize to fit the screen
  */
-export function calculateGridSize(maxTiles: number, minSize = 0) {
-  const { innerWidth, innerHeight } =
-    typeof window === "undefined"
-      ? { innerWidth: 100, innerHeight: 100 }
-      : window;
-  const tileSize = Math.max(
-    minSize,
-    Math.min(innerWidth / maxTiles, innerHeight / maxTiles),
-  );
-  const n = Math.floor(innerHeight / tileSize);
-  const m = Math.floor(innerWidth / tileSize);
-  return { n, m, tileSize };
+// export function calculateGridSize(maxTiles: number, minSize = 0) {
+//   const { innerWidth, innerHeight } =
+//     typeof window === "undefined"
+//       ? { innerWidth: 100, innerHeight: 100 }
+//       : window;
+//   const tileSize = Math.max(
+//     minSize,
+//     Math.min(innerWidth / maxTiles, innerHeight / maxTiles),
+//   );
+//   const n = Math.floor(innerHeight / tileSize);
+//   const m = Math.floor(innerWidth / tileSize);
+//   return { n, m, tileSize };
+// }
+
+export function calculateGridSize(
+  n: number,
+  m: number,
+  parentRect: DOMRect | undefined,
+): number {
+  if (!parentRect) return 0;
+  const tileSize = Math.min(parentRect.width / m, parentRect.height / n);
+  return tileSize;
 }
 
 export function generateColorGrid(

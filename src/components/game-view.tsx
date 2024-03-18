@@ -60,7 +60,6 @@ export default observer(function GameView({
   }
 
   return (
-    <div>
       <GameContext.Provider
         value={{
           gameServer,
@@ -74,7 +73,6 @@ export default observer(function GameView({
           <GameBoard />
         )}
       </GameContext.Provider>
-    </div>
   );
 });
 
