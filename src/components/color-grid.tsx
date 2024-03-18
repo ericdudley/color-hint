@@ -2,7 +2,7 @@ import { COLUMNS, ROWS } from "@/constants";
 import { GridColor } from "@/types";
 import { calculateGridSize, generateColorGrid } from "@/utils";
 import clsx from "clsx";
-import { ReactElement, useEffect, useState } from "react";
+import React, { ReactElement, useEffect, useState } from "react";
 
 export default function ColorGrid({
   parentRef,
@@ -35,33 +35,37 @@ export default function ColorGrid({
     return () => resizeObserver.unobserve(parentRefLocal);
   }, [parentRef]);
 
-  return generateColorGrid(ROWS, COLUMNS, 0).map((row, i) => (
-    <div className="flex flex-row" key={`${Math.random()}`}>
-      {row.map((color, j) => (
-        <div
-          key={j}
-          style={{
-            aspectRatio: "1/1",
-            width: `${tileSize}px`,
-            height: `${tileSize}px`,
-          }}
-        >
-          <div
-            className={clsx(
-              "w-full h-full transition-all hover:scale-[2.0] border hover:border-black rounded-md cursor-pointer",
+  return (
+    <React.Fragment>
+      {generateColorGrid(ROWS, COLUMNS, 0).map((row, i) => (
+        <div className="flex flex-row" key={`${Math.random()}`}>
+          {row.map((color, j) => (
+            <div
+              key={j}
+              style={{
+                aspectRatio: "1/1",
+                width: `${tileSize}px`,
+                height: `${tileSize}px`,
+              }}
+            >
+              <div
+                className={clsx(
+                  "w-full h-full transition-all hover:scale-[2.0] border hover:border-black rounded-md cursor-pointer",
 
-              selectedColors.some(
-                (selectedColor) =>
-                  selectedColor.x === j && selectedColor.y === i,
-              )
-                ? "border-black border-4 scale-125"
-                : "border-black",
-            )}
-            style={{ backgroundColor: color }}
-            onClick={() => onClick?.({ x: j, y: i })}
-          />
+                  selectedColors.some(
+                    (selectedColor) =>
+                      selectedColor.x === j && selectedColor.y === i,
+                  )
+                    ? "border-black border-4 scale-125"
+                    : "border-black",
+                )}
+                style={{ backgroundColor: color }}
+                onClick={() => onClick?.({ x: j, y: i })}
+              />
+            </div>
+          ))}
         </div>
       ))}
-    </div>
-  ));
+    </React.Fragment>
+  );
 }

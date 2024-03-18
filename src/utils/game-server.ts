@@ -435,9 +435,9 @@ export const currentRoundColorSelector: GameStateSelector<
   return currentRound.playerRounds[currentRound.playerRounds.length - 1].color;
 };
 
-export const currentRoundHintsSelector: GameStateSelector<string[]> = (
-  gameState,
-) => {
+export const currentRoundHintsSelector: GameStateSelector<
+  (string | undefined)[]
+> = (gameState) => {
   const currentRound = gameState.currentRound;
   return currentRound.playerRounds[
     currentRound.playerRounds.length - 1

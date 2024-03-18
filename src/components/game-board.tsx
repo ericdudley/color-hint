@@ -136,7 +136,7 @@ function HinterView(): ReactElement {
       };
       setColorOptions([...colorOptions]);
     }
-  }, [gameClient.gameState.currentRound]);
+  }, [gameClient.gameState.currentRound, colorOptions]);
 
   return (
     <div>
@@ -180,6 +180,7 @@ function HinterView(): ReactElement {
           <div className="flex items-center gap-2">
             {colorOptions.map((color, i) => (
               <div
+                key={i}
                 className="w-16 h-16 transition-all hover:scale-[1.5] cursor-pointer border-black hover:border-2 hover:border-black"
                 style={{ backgroundColor: colorGrid[color.y][color.x] }}
                 onClick={() => {

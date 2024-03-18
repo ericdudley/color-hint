@@ -100,7 +100,7 @@ export const IconNames = [
   "stopSign",
   "treehouse",
   "horse",
-  "candy"
+  "candy",
 ] as const;
 
 export type IconName = (typeof IconNames)[number];
@@ -120,5 +120,5 @@ export const ICON_NAME_TO_ICON: Record<
   stopSign: GiStopSign,
   treehouse: GiTreehouse,
   horse: GiTrojanHorse,
-  candy: GiWrappedSweet
+  candy: GiWrappedSweet,
 };

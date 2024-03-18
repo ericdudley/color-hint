@@ -60,19 +60,15 @@ export default observer(function GameView({
   }
 
   return (
-      <GameContext.Provider
-        value={{
-          gameServer,
-          gameClient,
-          lobbyCode: lobbyCode,
-        }}
-      >
-        {gameClient.gameState.status === "lobby" ? (
-          <GameLobby />
-        ) : (
-          <GameBoard />
-        )}
-      </GameContext.Provider>
+    <GameContext.Provider
+      value={{
+        gameServer,
+        gameClient,
+        lobbyCode: lobbyCode,
+      }}
+    >
+      {gameClient.gameState.status === "lobby" ? <GameLobby /> : <GameBoard />}
+    </GameContext.Provider>
   );
 });
 
