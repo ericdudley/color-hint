@@ -11,9 +11,11 @@ import { MdLink } from "react-icons/md";
 import {
   currentGuessesSelector,
   currentHinterSelector,
+  currentPlayerRoundGuessesSelector,
   currentRoundColorSelector,
   currentRoundHintSelector,
   currentRoundHintsSelector,
+  roundIsReadyToEndSelector,
 } from "@/utils/game-server";
 import { generateColorGrid } from "@/utils";
 import { COLOR_OPTIONS_COUNT, COLUMNS, ROWS } from "@/constants";
@@ -38,7 +40,12 @@ export default observer(function GameBoard() {
   return (
     <div className="flex-1 flex flex-col">
       <div className="flex items-center justify-between gap-4 p-4">
-        <h1 className="text-4xl font-bold">Color Hint</h1>
+        <div className="flex items-center gap-4">
+          <h1 className="text-4xl font-bold">Color Hint</h1>
+          <p className="text-xl">
+            Playing as {playerSettings.name} {playerSettings.id}
+          </p>
+        </div>
         <div className="flex items-center gap-4">
           <button
             className="btn btn-ghost"
@@ -82,7 +89,7 @@ export default observer(function GameBoard() {
                 ? currentColor
                   ? [currentColor]
                   : []
-                : currentGuessesSelector(gameClient.gameState).map(
+                : currentPlayerRoundGuessesSelector(gameClient.gameState).map(
                     (guess) => guess.guess,
                   )
             }
@@ -100,7 +107,7 @@ function GameStatusView(): ReactElement {
     currentHinterSelector(gameClient.gameState)?.id === playerSettings.id;
 
   return (
-    <div>
+    <div className="flex flex-col gap-8">
       {isHinter ? <HinterView /> : <GuesserView />}
       <HintsList />
     </div>
@@ -111,6 +118,7 @@ function HinterView(): ReactElement {
   const { gameClient } = useGameContext();
   const currentColor = currentRoundColorSelector(gameClient.gameState);
   const currentHint = currentRoundHintSelector(gameClient.gameState);
+  const canEndRound = roundIsReadyToEndSelector(gameClient.gameState);
 
   const colorGrid = generateColorGrid(ROWS, COLUMNS, 0);
 
@@ -133,6 +141,16 @@ function HinterView(): ReactElement {
   return (
     <div>
       <h2 className="text-2xl font-bold">Your are the hinter</h2>
+      {canEndRound && (
+        <button
+          className="btn btn-primary"
+          onClick={() => {
+            gameClient.endHintRound();
+          }}
+        >
+          End Round
+        </button>
+      )}
       {currentColor ? (
         currentHint ? (
           <WaitingView text="Waiting for other players to guess" />
@@ -142,6 +160,9 @@ function HinterView(): ReactElement {
               label="Enter a hint"
               value={hint}
               onChange={(e) => setHint(e.target.value)}
+              onSubmit={() => {
+                gameClient.chooseHint(hint);
+              }}
             />
             <button
               className="btn btn-primary"
@@ -235,6 +256,9 @@ function HintsList(): ReactElement {
         {gameClient.gameState.settings.hintsPerPlayerRound})
       </h2>
       <div className="flex items-center gap-2">
+        {currentHints.length === 0 && (
+          <p>No hints have been given yet this round</p>
+        )}
         {currentHints.map((hint, i) => (
           <p
             key={i}

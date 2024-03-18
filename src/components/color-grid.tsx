@@ -48,7 +48,7 @@ export default function ColorGrid({
         >
           <div
             className={clsx(
-              "w-full h-full transition-all hover:scale-[2.0] border hover:border-black",
+              "w-full h-full transition-all hover:scale-[2.0] border hover:border-black rounded-md cursor-pointer",
 
               selectedColors.some(
                 (selectedColor) =>

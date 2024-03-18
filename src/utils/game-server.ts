@@ -121,7 +121,12 @@ export default class GameServer {
           playerRounds: [
             {
               hintingPlayerId: this.gameState.players[0].id,
-              hintRounds: [],
+              hintRounds: [
+                {
+                  hint: undefined,
+                  guesses: [],
+                },
+              ],
             },
           ],
         };
@@ -145,20 +150,19 @@ export default class GameServer {
         break;
       }
       case "hintChosen":
-        const currentHints = currentRoundHintsSelector(this.gameState);
-        if (
-          currentHints.length >= this.gameState.settings.hintsPerPlayerRound
-        ) {
+        const currentRound = this.gameState.currentRound;
+        const currentPlayerRound =
+          currentRound.playerRounds[currentRound.playerRounds.length - 1];
+        const currentHintRound =
+          currentPlayerRound.hintRounds[
+            currentPlayerRound.hintRounds.length - 1
+          ];
+
+        if (currentHintRound.hint) {
           return;
         }
 
-        const currentRound = this.gameState.currentRound;
-        currentRound.playerRounds[
-          currentRound.playerRounds.length - 1
-        ].hintRounds.push({
-          hint: message.data,
-          guesses: [],
-        });
+        currentHintRound.hint = message.data;
         this.channelClient.publish("gameStateUpdate", this.gameState);
         break;
 
@@ -201,6 +205,35 @@ export default class GameServer {
               guesses: [],
             });
           }
+        }
+
+        this.channelClient.publish("gameStateUpdate", this.gameState);
+        break;
+      }
+      case "endHintRound": {
+        const currentRound = this.gameState.currentRound;
+        const currentPlayerRound =
+          currentRound.playerRounds[currentRound.playerRounds.length - 1];
+        const currentHintRound =
+          currentPlayerRound.hintRounds[
+            currentPlayerRound.hintRounds.length - 1
+          ];
+
+        // If all players have guessed, move to the next round
+        if (
+          currentHintRound.guesses.length ===
+          this.gameState.players.length - 1
+        ) {
+          // Check if there are more hint rounds
+          if (
+            currentPlayerRound.hintRounds.length <
+            this.gameState.settings.hintsPerPlayerRound
+          ) {
+            currentPlayerRound.hintRounds.push({
+              hint: undefined,
+              guesses: [],
+            });
+          }
           // If not, move to the next player
           else {
             // Find the next player who hasn't hinted
@@ -216,15 +249,25 @@ export default class GameServer {
                 round: currentRound.round + 1,
                 playerRounds: [
                   {
-                    hintingPlayerId: "",
-                    hintRounds: [],
+                    hintingPlayerId: this.gameState.players[0].id,
+                    hintRounds: [
+                      {
+                        hint: undefined,
+                        guesses: [],
+                      },
+                    ],
                   },
                 ],
               };
             } else {
               currentRound.playerRounds.push({
                 hintingPlayerId: nextPlayer.id,
-                hintRounds: [],
+                hintRounds: [
+                  {
+                    hint: undefined,
+                    guesses: [],
+                  },
+                ],
               });
             }
           }
@@ -310,6 +353,10 @@ export class GameClient {
     this.channelClient.publish("guessChosen", color);
   };
 
+  endHintRound = () => {
+    this.channelClient.publish("endHintRound", undefined);
+  };
+
   leaveGame = () => {
     this.channelClient.publish("playerLeave", playerSettings.player);
     this.channelClient.close();
@@ -335,6 +382,7 @@ type MessageName =
   | "colorChosen"
   | "hintChosen"
   | "guessChosen"
+  | "endHintRound"
   | "startGame"
   | "endGame";
 type MessageNameToPayload = {
@@ -345,6 +393,7 @@ type MessageNameToPayload = {
   guessChosen: GridColor;
   hintChosen: string;
   gameStateUpdate: GameState;
+  endHintRound: undefined;
   startGame: undefined;
   endGame: undefined;
 };
@@ -371,8 +420,11 @@ export const currentHinterSelector: GameStateSelector<Player | undefined> = (
   gameState,
 ) => {
   const currentRound = gameState.currentRound;
-  return gameState.players.find((p) =>
-    currentRound.playerRounds.every((pr) => pr.hintingPlayerId !== p.id),
+  const currentPlayerRound =
+    currentRound.playerRounds[currentRound.playerRounds.length - 1];
+
+  return gameState.players.find(
+    (p) => p.id === currentPlayerRound.hintingPlayerId,
   );
 };
 
@@ -399,6 +451,15 @@ export const currentRoundHintSelector: GameStateSelector<string | undefined> = (
   return currentHints[currentHints.length - 1];
 };
 
+export const currentPlayerRoundGuessesSelector: GameStateSelector<Guess[]> = (
+  gameState,
+) => {
+  const currentRound = gameState.currentRound;
+  const currentPlayerRound =
+    currentRound.playerRounds[currentRound.playerRounds.length - 1];
+  return currentPlayerRound.hintRounds.flatMap((hr) => hr.guesses);
+};
+
 export const currentGuessesSelector: GameStateSelector<Guess[]> = (
   gameState,
 ) => {
@@ -408,4 +469,20 @@ export const currentGuessesSelector: GameStateSelector<Guess[]> = (
   const currentHintRound =
     currentPlayerRound.hintRounds[currentPlayerRound.hintRounds.length - 1];
   return currentHintRound?.guesses ?? [];
+};
+
+export const roundIsReadyToEndSelector: GameStateSelector<boolean> = (
+  gameState,
+) => {
+  const currentRound = gameState.currentRound;
+  const currentPlayerRound =
+    currentRound.playerRounds[currentRound.playerRounds.length - 1];
+  const currentHintRound =
+    currentPlayerRound.hintRounds[currentPlayerRound.hintRounds.length - 1];
+
+  return (
+    currentHintRound.guesses.length === gameState.players.length - 1 &&
+    currentPlayerRound.hintRounds.length ===
+      gameState.settings.hintsPerPlayerRound
+  );
 };
