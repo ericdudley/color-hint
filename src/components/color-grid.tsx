@@ -1,16 +1,17 @@
 import { COLUMNS, ROWS } from "@/constants";
-import { GridColor } from "@/types";
+import { GridColor, GridSelection, Player } from "@/types";
 import { calculateGridSize, generateColorGrid } from "@/utils";
+import { ICON_NAME_TO_ICON } from "@/utils/player-settings";
 import clsx from "clsx";
-import React, { ReactElement, useEffect, useState } from "react";
+import React, { Fragment, ReactElement, useEffect, useState } from "react";
 
 export default function ColorGrid({
   parentRef,
-  selectedColors = [],
+  selections = [],
   onClick,
 }: {
   parentRef: React.RefObject<HTMLDivElement>;
-  selectedColors?: GridColor[];
+  selections?: GridSelection[];
   onClick?: (color: GridColor) => void;
 }): ReactElement {
   const parentRefSize = parentRef.current?.getBoundingClientRect();
@@ -39,33 +40,68 @@ export default function ColorGrid({
     <React.Fragment>
       {generateColorGrid(ROWS, COLUMNS, 0).map((row, i) => (
         <div className="flex flex-row" key={`${Math.random()}`}>
-          {row.map((color, j) => (
-            <div
-              key={j}
-              style={{
-                aspectRatio: "1/1",
-                width: `${tileSize}px`,
-                height: `${tileSize}px`,
-              }}
-            >
-              <div
-                className={clsx(
-                  "w-full h-full transition-all hover:scale-[2.0] border hover:border-black rounded-md cursor-pointer",
+          {row.map((color, j) => {
+            const tileSelections = selections.filter(
+              (selection) =>
+                selection.gridColor.x === j && selection.gridColor.y === i,
+            );
 
-                  selectedColors.some(
-                    (selectedColor) =>
-                      selectedColor.x === j && selectedColor.y === i,
-                  )
-                    ? "border-black border-4 scale-125"
-                    : "border-black",
-                )}
-                style={{ backgroundColor: color }}
-                onClick={() => onClick?.({ x: j, y: i })}
-              />
-            </div>
-          ))}
+            return (
+              <div
+                key={j}
+                style={{
+                  aspectRatio: "1/1",
+                  width: `${tileSize}px`,
+                  height: `${tileSize}px`,
+                }}
+              >
+                <div
+                  className={clsx(
+                    "w-full h-full transition-all hover:scale-[2.0] border hover:border-black rounded-md cursor-pointer",
+
+                    selections.some(
+                      (selection) =>
+                        selection.gridColor.x === j &&
+                        selection.gridColor.y === i,
+                    )
+                      ? "border-black border-4 scale-125"
+                      : "border-black",
+                  )}
+                  style={{
+                    backgroundColor: color,
+                    ...getSquareGridStyles(tileSelections.length),
+                  }}
+                  onClick={() => onClick?.({ x: j, y: i })}
+                >
+                  {tileSelections.map((selection, i) => {
+                    const Icon = selection.player?.icon
+                      ? ICON_NAME_TO_ICON[selection.player?.icon]
+                      : Fragment;
+                    const color = selection.player?.color || "black";
+                    return (
+                      <Icon
+                        key={i}
+                        className="w-full h-full"
+                        style={{ color: color }}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
         </div>
       ))}
     </React.Fragment>
   );
+}
+
+function getSquareGridStyles(items: number) {
+  const sideLength = Math.ceil(Math.sqrt(items));
+
+  return {
+    display: "grid",
+    gridTemplateColumns: `repeat(${sideLength}, 1fr)`,
+    gridTemplateRows: `repeat(${sideLength}, 1fr)`,
+  };
 }

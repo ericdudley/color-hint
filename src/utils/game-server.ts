@@ -4,7 +4,14 @@ import { generateLobbyCode } from "./uuid";
 import * as Ably from "ably";
 import { makeAutoObservable } from "mobx";
 import debug from "debug";
-import { GameRound, GameState, GridColor, Guess, Player } from "@/types";
+import {
+  GameRound,
+  GameState,
+  GridColor,
+  GridSelection,
+  Guess,
+  Player,
+} from "@/types";
 import { MAX_PLAYERS } from "@/constants";
 const d = debug("game-server");
 d.enabled = true;
@@ -319,8 +326,13 @@ export class GameClient {
     console.log("client", message);
     switch (message.name) {
       case "gameStateUpdate":
-        this.gameState = message.data; // Assuming the client has a gameState object
-        // Update local player state based on gameState, if necessary
+        this.gameState = message.data;
+
+        if (
+          !this.gameState.players.find((p) => p.id === playerSettings.player.id)
+        ) {
+          this.channelClient.publish("playerJoin", playerSettings.player);
+        }
         break;
     }
   };
@@ -485,4 +497,19 @@ export const roundIsReadyToEndSelector: GameStateSelector<boolean> = (
     currentPlayerRound.hintRounds.length ===
       gameState.settings.hintsPerPlayerRound
   );
+};
+
+export const hintRoundVisibleSelectionsSelector: GameStateSelector<
+  GridSelection[]
+> = (gameState) => {
+  const currentRound = gameState.currentRound;
+  const currentPlayerRound =
+    currentRound.playerRounds[currentRound.playerRounds.length - 1];
+  const currentHintRound =
+    currentPlayerRound.hintRounds[currentPlayerRound.hintRounds.length - 1];
+
+  return currentHintRound.guesses.map((g) => ({
+    gridColor: g.guess,
+    player: gameState.players.find((p) => p.id === g.playerId),
+  }));
 };

@@ -15,6 +15,7 @@ import {
   currentRoundColorSelector,
   currentRoundHintSelector,
   currentRoundHintsSelector,
+  hintRoundVisibleSelectionsSelector,
   roundIsReadyToEndSelector,
 } from "@/utils/game-server";
 import { generateColorGrid } from "@/utils";
@@ -42,9 +43,7 @@ export default observer(function GameBoard() {
       <div className="flex items-center justify-between gap-4 p-4">
         <div className="flex items-center gap-4">
           <h1 className="text-4xl font-bold">Color Hint</h1>
-          <p className="text-xl">
-            Playing as {playerSettings.name} {playerSettings.id}
-          </p>
+          <p className="text-xl">Playing as {playerSettings.name}</p>
         </div>
         <div className="flex items-center gap-4">
           <button
@@ -84,14 +83,12 @@ export default observer(function GameBoard() {
         <div className="col-span-2 p-8" ref={gridWrapperRef}>
           <ColorGrid
             parentRef={gridWrapperRef}
-            selectedColors={
+            selections={
               isHinter
                 ? currentColor
-                  ? [currentColor]
+                  ? [{ player: playerSettings.player, gridColor: currentColor }]
                   : []
-                : currentPlayerRoundGuessesSelector(gameClient.gameState).map(
-                    (guess) => guess.guess,
-                  )
+                : hintRoundVisibleSelectionsSelector(gameClient.gameState)
             }
             onClick={onGridClick}
           />
@@ -153,7 +150,7 @@ function HinterView(): ReactElement {
       )}
       {currentColor ? (
         currentHint ? (
-          <WaitingView text="Waiting for other players to guess" />
+          <WaitingView text="Waiting for players to guess" />
         ) : (
           <div className="flex flex-col gap-2">
             <Input
@@ -253,14 +250,14 @@ function HintsList(): ReactElement {
   return (
     <div className="flex flex-col gap-2">
       <h2 className="text-2xl font-bold">
-        Hints ({currentHints.length}/
+        Hints ({currentHints.filter(Boolean).length}/
         {gameClient.gameState.settings.hintsPerPlayerRound})
       </h2>
       <div className="flex items-center gap-2">
         {currentHints.length === 0 && (
           <p>No hints have been given yet this round</p>
         )}
-        {currentHints.map((hint, i) => (
+        {currentHints.filter(Boolean).map((hint, i) => (
           <p
             key={i}
             className="text-lg bg-primary text-primary-content p-2 rounded-lg"

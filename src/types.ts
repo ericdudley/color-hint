@@ -56,3 +56,8 @@ export type GameState = {
   status: GameStatus;
   currentRound: GameRound;
 };
+
+export type GridSelection = {
+  gridColor: GridColor;
+  player?: Player;
+};

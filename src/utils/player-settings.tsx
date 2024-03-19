@@ -21,7 +21,7 @@ export default class PlayerSettings {
   id: string = generateUUID();
   name: string = generateName();
   icon: IconName = "paintbrush";
-  color: string = "#000000";
+  color: string = "#ffffff";
   isHost: boolean = false;
 
   constructor() {
@@ -107,7 +107,7 @@ export type IconName = (typeof IconNames)[number];
 
 export const ICON_NAME_TO_ICON: Record<
   IconName,
-  ComponentType<{ className: string }>
+  ComponentType<{ className: string; style?: { color: string } }>
 > = {
   paintbrush: GiPaintBrush,
   glasses: Gi3DGlasses,
