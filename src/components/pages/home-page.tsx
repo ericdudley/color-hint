@@ -12,14 +12,11 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { MdAddCircle, MdArrowRight } from "react-icons/md";
 import CenteredLayout from "../centered-layout";
+import { DEFAULT_GAMES_SETTINGS } from "@/constants";
 
 export default observer(function HomePage() {
   const router = useRouter();
-  const [gameSettings, setGameSettings] = useState<GameSettings>({
-    guessesPerPlayerRound: 3,
-    hintsPerPlayerRound: 3,
-    rounds: 3,
-  });
+  const [gameSettings, setGameSettings] = useState<GameSettings>(DEFAULT_GAMES_SETTINGS);
 
   const [joinLobbyCode, setJoinLobbyCode] = useState<string>("");
 

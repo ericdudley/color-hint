@@ -81,15 +81,13 @@ export default observer(function GameBoard() {
           <PlayerList />
         </div>
         <div className="col-span-2 p-8" ref={gridWrapperRef}>
+          <pre>{JSON.stringify(gameClient.gameState, null, 2)}</pre>
           <ColorGrid
             parentRef={gridWrapperRef}
             selections={
-              isHinter
-                ? currentColor
-                  ? [{ player: playerSettings.player, gridColor: currentColor }]
-                  : []
-                : hintRoundVisibleSelectionsSelector(gameClient.gameState)
-            }
+              hintRoundVisibleSelectionsSelector(
+              gameClient.gameState,
+            )}
             onClick={onGridClick}
           />
         </div>
@@ -207,7 +205,7 @@ function GuesserView(): ReactElement {
   }
 
   if (
-    currentGuesses.length >= gameClient.gameState.settings.guessesPerPlayerRound
+    currentGuesses.length >= gameClient.gameState.settings.guessesPerHintRound
   ) {
     return <WaitingView text="Waiting for other players to guess" />;
   }

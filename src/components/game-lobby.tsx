@@ -84,7 +84,9 @@ export default observer(function GameLobby(): ReactElement {
         )}
       </div>
       <div className="flex items-end">
-        <p>Waiting for other players to join</p>
+        <p>{
+            playerSettings.isHost ? "Waiting for other players to join" : "Waiting for host to start the game"
+          }</p>
         <div className="loading loading-dots loading-xs" />
       </div>
       {gameClient.gameState.players.map((player) => (

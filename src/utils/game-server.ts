@@ -10,7 +10,9 @@ import {
   GridColor,
   GridSelection,
   Guess,
+  HintRound,
   Player,
+  PlayerRound,
 } from "@/types";
 import { MAX_PLAYERS } from "@/constants";
 const d = debug("game-server");
@@ -60,7 +62,7 @@ export default class GameServer {
     settings: {
       rounds: 3,
       hintsPerPlayerRound: 2,
-      guessesPerPlayerRound: 2,
+      guessesPerHintRound: 2,
     },
     scores: {},
     status: "lobby",
@@ -157,13 +159,7 @@ export default class GameServer {
         break;
       }
       case "hintChosen":
-        const currentRound = this.gameState.currentRound;
-        const currentPlayerRound =
-          currentRound.playerRounds[currentRound.playerRounds.length - 1];
-        const currentHintRound =
-          currentPlayerRound.hintRounds[
-            currentPlayerRound.hintRounds.length - 1
-          ];
+        const { currentHintRound } = currentRoundsSelector(this.gameState);
 
         if (currentHintRound.hint) {
           return;
@@ -174,20 +170,21 @@ export default class GameServer {
         break;
 
       case "guessChosen": {
-        const currentRound = this.gameState.currentRound;
-        const currentPlayerRound =
-          currentRound.playerRounds[currentRound.playerRounds.length - 1];
-        const currentHintRound =
-          currentPlayerRound.hintRounds[
-            currentPlayerRound.hintRounds.length - 1
-          ];
+        const { currentPlayerRound, currentHintRound } = currentRoundsSelector(
+          this.gameState,
+        );
+
+        // Not allowed to guess until a color and hint have been chosen
+        if (!currentPlayerRound.color || !currentHintRound.hint) {
+          return;
+        }
 
         const playersGuesses = currentHintRound.guesses
           .map((g) => g.playerId)
           .filter((id) => id === message.metadata.playerId);
 
         if (
-          playersGuesses.length >= this.gameState.settings.guessesPerPlayerRound
+          playersGuesses.length >= this.gameState.settings.guessesPerHintRound
         ) {
           return;
         }
@@ -299,7 +296,7 @@ export class GameClient {
     settings: {
       rounds: 3,
       hintsPerPlayerRound: 2,
-      guessesPerPlayerRound: 2,
+      guessesPerHintRound: 2,
     },
     scores: {},
     status: "lobby",
@@ -443,7 +440,7 @@ export const currentHinterSelector: GameStateSelector<Player | undefined> = (
 export const currentRoundColorSelector: GameStateSelector<
   GridColor | undefined
 > = (gameState) => {
-  const currentRound = gameState.currentRound;
+  const { currentRound } = currentRoundsSelector(gameState);
   return currentRound.playerRounds[currentRound.playerRounds.length - 1].color;
 };
 
@@ -502,14 +499,61 @@ export const roundIsReadyToEndSelector: GameStateSelector<boolean> = (
 export const hintRoundVisibleSelectionsSelector: GameStateSelector<
   GridSelection[]
 > = (gameState) => {
+  const { currentPlayerRound } =
+    currentRoundsSelector(gameState);
+
+  const isRoundOver = roundIsReadyToEndSelector(gameState);
+
+  const mySelections = currentPlayerRound.hintRounds.flatMap((hr) =>
+    hr.guesses.filter((g) => g.playerId === playerSettings.id),
+  );
+
+  const prevHintRoundSelections = currentPlayerRound.hintRounds
+    .slice(0, -1)
+    .flatMap((hr) => hr.guesses)
+    .filter((g) => g.playerId !== playerSettings.id);
+
+  const guessedColor: Guess | undefined =
+    currentPlayerRound.color &&
+    (isRoundOver || currentPlayerRound.hintingPlayerId === playerSettings.id)
+      ? {
+          guess: currentPlayerRound.color,
+          playerId: currentPlayerRound.hintingPlayerId,
+        }
+      : undefined;
+
+  return [...mySelections, ...prevHintRoundSelections, guessedColor]
+    .map((g) =>
+      g
+        ? {
+            gridColor: g.guess,
+            player: gameState.players.find((p) => p.id === g.playerId),
+            isChosenColor:
+              g.guess.x === currentPlayerRound.color?.x &&
+              g.guess.y === currentPlayerRound.color?.y,
+          }
+        : undefined,
+    )
+    .filter(Boolean) as GridSelection[];
+};
+
+/**
+ * Returns the current round, player rounds, and hint rounds.
+ */
+export const currentRoundsSelector: GameStateSelector<{
+  currentRound: GameRound;
+  currentPlayerRound: PlayerRound;
+  currentHintRound: HintRound;
+}> = (gameState) => {
   const currentRound = gameState.currentRound;
   const currentPlayerRound =
     currentRound.playerRounds[currentRound.playerRounds.length - 1];
   const currentHintRound =
     currentPlayerRound.hintRounds[currentPlayerRound.hintRounds.length - 1];
 
-  return currentHintRound.guesses.map((g) => ({
-    gridColor: g.guess,
-    player: gameState.players.find((p) => p.id === g.playerId),
-  }));
+  return {
+    currentRound,
+    currentPlayerRound,
+    currentHintRound,
+  };
 };

@@ -66,12 +66,12 @@ export default observer(function GameSettingsForm({
           </div>
           <input
             type="number"
-            name="guessesPerPlayerRound"
+            name="guessesPerHintRound"
             placeholder="Guesses per Round"
             min="1"
             max="10"
             className="input"
-            value={settings.guessesPerPlayerRound}
+            value={settings.guessesPerHintRound}
             onChange={handleInputChange}
           />
         </div>

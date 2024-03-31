@@ -18,7 +18,7 @@ export type Player = {
 export type GameSettings = {
   rounds: number;
   hintsPerPlayerRound: number;
-  guessesPerPlayerRound: number;
+  guessesPerHintRound: number;
 };
 
 export type Guess = {
@@ -60,4 +60,5 @@ export type GameState = {
 export type GridSelection = {
   gridColor: GridColor;
   player?: Player;
+  isChosenColor?: boolean;
 };

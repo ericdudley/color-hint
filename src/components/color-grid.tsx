@@ -46,6 +46,10 @@ export default function ColorGrid({
                 selection.gridColor.x === j && selection.gridColor.y === i,
             );
 
+            const isChosenColor = tileSelections.some(
+              (selection) => selection.isChosenColor,
+            );
+
             return (
               <div
                 key={j}
@@ -57,16 +61,15 @@ export default function ColorGrid({
               >
                 <div
                   className={clsx(
-                    "w-full h-full transition-all hover:scale-[2.0] border hover:border-black rounded-md cursor-pointer",
+                    "w-full h-full transition-all hover:scale-[2.0] border hover:border-black rounded-md cursor-pointer group",
 
-                    selections.some(
-                      (selection) =>
-                        selection.gridColor.x === j &&
-                        selection.gridColor.y === i,
-                    )
-                      ? "border-black border-4 scale-125"
+                    tileSelections.length > 0
+                      ? isChosenColor
+                        ? "border-white border-4 scale-150 tooltip tooltip-open"
+                        : "border-black border-2 scale-125"
                       : "border-black",
                   )}
+                  data-tip={isChosenColor ? "Chosen Color" : ""}
                   style={{
                     backgroundColor: color,
                     ...getSquareGridStyles(tileSelections.length),
@@ -81,7 +84,7 @@ export default function ColorGrid({
                     return (
                       <Icon
                         key={i}
-                        className="w-full h-full"
+                        className="p-1 w-full opacity-25 h-full group-hover:opacity-0"
                         style={{ color: color }}
                       />
                     );
